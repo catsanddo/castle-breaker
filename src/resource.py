@@ -1,6 +1,25 @@
 import pygame as pg
 from os import path
 
+class Animation:
+    def __init__(self, images, fps):
+        self.frames = images
+        self.frame = 0
+
+        self.period = 1 / fps
+        self.time = 0
+
+    def get_image(self):
+        return self.frames[self.frame]
+
+    def update(self, tick):
+        self.time += tick
+        while self.time > self.period:
+            self.time -= self.period
+            self.frame += 1
+            if self.frame >= len(self.frames):
+                self.frame = 0
+
 class Manager:
     COLOR_KEY = (255, 16, 255)
 
@@ -18,11 +37,10 @@ class Manager:
         "brick_broken": pg.Rect(256, 224, 128, 32),
         "grass": pg.Rect(384, 128, 64, 64),
         "cobble": pg.Rect(448, 128, 64, 64),
-        "dragon_sleeping": [
-            pg.Rect(0, 0, 256, 128),
-            pg.Rect(256, 0, 256, 128),
-        ],
-        "dragon_nervous": pg.Rect(0, 128, 256, 128)
+        "orb": pg.Rect(0, 0, 128, 128),
+        "orb_chipped": pg.Rect(128, 0, 128, 128),
+        "orb_cracked": pg.Rect(256, 0, 128, 128),
+        "orb_shattered": pg.Rect(384, 0, 128, 128)
     }
 
     @classmethod
@@ -34,10 +52,17 @@ class Manager:
         if name in cls.images:
             return cls.images[name]
 
-        print(name)
-
         rect = cls.atlas_map[name]
-        surface = pg.Surface(rect.size, pg.SRCALPHA, cls.atlas)
-        surface.blit(cls.atlas, (0, 0), rect)
-        cls.images[name] = surface
+        if type(rect) is list:
+            frames = []
+            for r in rect:
+                surface = pg.Surface(r.size, pg.SRCALPHA, cls.atlas)
+                surface.blit(cls.atlas, (0, 0), r)
+                frames.append(surface)
+            rect = rect[0]
+            cls.images[name] = Animation(frames, 5)
+        else:
+            surface = pg.Surface(rect.size, pg.SRCALPHA, cls.atlas)
+            surface.blit(cls.atlas, (0, 0), rect)
+            cls.images[name] = surface
         return cls.images[name]

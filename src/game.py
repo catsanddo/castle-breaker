@@ -43,7 +43,8 @@ class Game:
     DEBUG = False
 
     def __init__(self):
-        self.screen = pg.display.set_mode((self.WIDTH, self.HEIGHT))
+        # self.screen = pg.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen = pg.display.get_surface()
         self.clock = pg.time.Clock()
         self.won = False
         self.lost = False
@@ -89,6 +90,9 @@ class Game:
                 if event.type == pg.QUIT:
                     running = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
+                    # Replay game by returning True
+                    if self.won or self.lost:
+                        return True
                     ball_x = self.paddle.rect.centerx
                     ball_y = self.paddle.rect.y - 8
                     if Game.DEBUG or self.ball_count > 0:
@@ -132,8 +136,10 @@ class Game:
 
             if self.won:
                 game_text("You Won!", Game.WIDTH // 2, 180)
+                game_text("Click to play again", Game.WIDTH // 2, 270)
             elif self.lost:
                 game_text("You Lost", Game.WIDTH // 2, 180)
+                game_text("Click to play again", Game.WIDTH // 2, 270)
             elif len(self.balls) <= 0:
                 game_text("Click to start!", Game.WIDTH // 2, 180)
 
@@ -154,3 +160,7 @@ class Game:
 
             pg.display.flip()
             self.clock.tick(60)
+        # End while loop
+
+        # return False to quit game
+        return False

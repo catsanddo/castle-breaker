@@ -192,11 +192,11 @@ class Orb:
 
     def update(self):
         if self.hit and self.cooldown <= 0:
-            self.hit = False
             self.health -= 1
             self.cooldown = 30
             textures = ("orb_shattered", "orb_cracked", "orb_chipped")
             self.image = Manager.load_texture(textures[self.health])
+        self.hit = False
         self.cooldown -= 1
         if self.cooldown < 0:
             self.cooldown = 0
